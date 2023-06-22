@@ -1,6 +1,10 @@
 const Joi = require('joi');
 
 const loginSchema = Joi.object({
+  name: Joi.string().min(2).required().messages({
+    'string.empty': 'O campo nome é obrigatório!',
+    'string.min': 'O compo nome deve ter ao menos 2 caracteres!'
+  }),
   email: Joi.string().email().required().messages({
     'string.empty': 'O campo email é obrigatório!',
     'string.email': 'O email deve ser um email válido!'

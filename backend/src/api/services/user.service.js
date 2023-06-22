@@ -6,11 +6,6 @@ const getLogin = async (email, password) => {
   return user;
 };
 
-const getAllUsers = async () => {
-  const users = await User.findAll();
-  return users;
-};
-
 const getUser = async (email) => {
   const user = await User.findOne({ where: { email } });
   return user;
@@ -26,22 +21,9 @@ const createUser = async (user) => {
   return newUser;
 };
 
-const getSellers = async (role) => {
-  const sellers = await User.findAll({ where: { role } });
-  return sellers;
-};
-
-const deleteUser = async (id) => {
-  const user = await User.destroy({ where: { id } });
-  return user;
-};
-
 module.exports = {
   getLogin,
   getUser,
   createUser,
-  getSellers,
   getUserById,
-  getAllUsers,
-  deleteUser,
 };

@@ -1,114 +1,113 @@
-const saleService = require('../services/sale.service');
-const productService = require('../services/product.service');
+const postService = require('../services/post.service');
+const userService = require('../services/user.service');
 
-const response = (sale, cart, status, method) => ({
-  hasToken: false,
+const response = (post, userName, status, method) => ({
   method,
   status,
-  message: 'Order created',
+  message: 'Post created',
   result: {
-    id: sale.id,
-    userId: sale.userId,
-    sellerId: sale.sellerId,
-    totalPrice: sale.totalPrice,
-    deliveryAddress: sale.deliveryAddress,
-    deliveryNumber: sale.deliveryNumber,
-    status: sale.status,
-    saleDate: sale.saleDate,
-    cart,
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    published: post.published,
+    updated: post.updated,
+    userId: post.userId,
+    userName,
   },
 });
 
-const createSale = async (req, res) => {
-  const { userId, sellerId, totalPrice, deliveryAddress, deliveryNumber, cart } = req.body;
+const createPost = async (req, res) => {
+  const { title, content, userId } = req.body;
 
-  const newSale = await saleService.createSale({
-    userId: Number(userId),
-    sellerId: Number(sellerId),
-    totalPrice: Number(totalPrice),
-    deliveryAddress,
-    deliveryNumber,
-    status: 'Pendente',
-    saleDate: Date.now(),
+  const date = new Date();
+
+  const newPost = await postService.createPost({
+    title, content, userId, updated: date, published: date
   });
 
-  await Promise.all(cart
-    .map(async (product) => saleService
-    .createSaleProduct({
-      productId: product.id,
-      saleId: newSale.id,
-      quantity: product.quantity,
-    })));
+  const user = userService.getUserById(newPost.userId);
 
-  return res.status(201).json(response(newSale, cart, 201, 'POST'));
+  return res.status(201).json(response(newPost, user.name, 201, 'POST'));
 };
 
-const getAllSales = async (_req, res) => {
-  const sales = await saleService.getAllSales();
+const getAllPosts = async (_req, res) => {
+  const posts = await postService.getAllPosts();
 
-  const cart = await Promise.all(sales
-    .map(async (sale) => saleService
-    .getSalesProductsById(sale.id)));
+  const postList = [];
 
-  const xablau = [];
-
-  for (let i = 0; i < sales.length; i += 1) {
-    xablau.push(response(sales[i], cart[i], 200, 'GET'));
+  for (let i = 0; i < posts.length; i += 1) {
+    const user = async () => await userService.getUserById(posts[i].userId);
+    postList.push(response(posts[i], user.name, 200, 'GET'));
   }
 
-  return res.status(200).json(xablau);
+  return res.status(200).json(postList);
 };
 
-const getSaleById = async (req, res) => {
+const getPostById = async (req, res) => {
   const { id } = req.params;
 
-  const order = await saleService.getSaleById(id);
+  const hasPost = await postService.getPostById(id);
   
-  const cart = await saleService.getSalesProductsById(id);
-  
-  const productsCart = await Promise.all(cart
-    .map(async (product) => productService
-    .getProductById(product.productId)));
-    
-  const xablau = [];
-  
-  for (let i = 0; i < productsCart.length; i += 1) {
-    xablau.push({
-      id: cart[i].productId,
-      name: productsCart[i].name,
-      price: productsCart[i].price,
-      quantity: cart[i].quantity,
-    });
-  }
-
-  return res.status(200).json(response(order, xablau, 200, 'GET'));
-};
-
-const updateSale = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  let order = await saleService.getSaleById(id);
-
-  if (!order) {
+  if (!hasPost) {
     return res.status(404).json({
       hasToken: false,
       method: 'POST',
       status: 404,
-      message: 'Venda não encontrada',
+      message: 'Post não encontrado!',
+    });
+  }
+  
+  const user = userService.getUserById(hasPost.userId);
+
+  return res.status(200).json(response(hasPost, user.name, 200, 'GET'));
+};
+
+const updatePost = async (req, res) => {
+  const { id } = req.params;
+  const { title, content, userId } = req.body;
+
+  let hasPost = await postService.getPostById(id);
+
+  if (!hasPost) {
+    return res.status(404).json({
+      hasToken: false,
+      method: 'POST',
+      status: 404,
+      message: 'Post não encontrado!',
     });
   }
 
-  await saleService.updateSale({ id, status });
+  const updatedPost = await postService.updatePost({ id, title, content });
+  
+  const user = userService.getUserById(userId);
 
-  order = await saleService.getSaleById(id);
-
-  return res.status(200).json(response(order, '', 200, 'POST'));
+  return res.status(200).json(response(updatedPost, user.name, 200, 'POST'));
 };
 
+const deletePost = async (req, res) => {
+  const { id } = req.params;
+
+  let hasPost = await postService.getPostById(id);
+
+  if (!hasPost) {
+    return res.status(404).json({
+      hasToken: false,
+      method: 'POST',
+      status: 404,
+      message: 'Post não encontrado!',
+    });
+  }
+  
+  await postService.deletePost(id);
+
+  return res.status(204).json();
+};
+
+
 module.exports = {
-  createSale,
-  getAllSales,
-  getSaleById,
-  updateSale,
+  createPost,
+  getAllPosts,
+  getPostById,
+  updatePost,
+  deletePost,
 };
