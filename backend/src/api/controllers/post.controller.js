@@ -26,6 +26,7 @@ const createPost = async (req, res) => {
   });
 
   const user = await userService.getUserById(newPost.userId);
+  console.log(newPost);
 
   return res.status(201).json(response(newPost, user.name, 201, 'POST'));
 };
@@ -66,7 +67,7 @@ const updatePost = async (req, res) => {
   const { id } = req.params;
   const { title, content, userId } = req.body;
 
-  let hasPost = await postService.getPostById(id);
+  let hasPost = await postService.getPost(id, userId);
 
   if (!hasPost) {
     return res.status(404).json({
@@ -77,7 +78,11 @@ const updatePost = async (req, res) => {
     });
   }
 
-  const updatedPost = await postService.updatePost({ id, title, content });
+  const date = new Date();
+
+  await postService.updatePost({ id, title, content, update: date });
+  
+  const updatedPost = await postService.getPostById(id);
   
   const user = await userService.getUserById(userId);
 

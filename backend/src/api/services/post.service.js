@@ -10,8 +10,8 @@ const getAllPosts = async () => {
   return posts;
 };
 
-const getPost = async (title) => {
-  const post = await Post.findOne({ where: { title } });
+const getPost = async (id, userId) => {
+  const post = await Post.findOne({ where: { id, userId } });
   return post;
 };
 
@@ -20,8 +20,8 @@ const getPostById = async (id) => {
   return post;
 };
 
-const updatePost = async ({ id, title, content }) => {
-  const post = await Post.update({ title, content }, { where: { id } });
+const updatePost = async ({ id, title, content, updated }) => {
+  const post = await Post.update({ title, content, updated }, { where: { id } });
   return post;
 };
 
