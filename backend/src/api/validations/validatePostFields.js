@@ -14,6 +14,7 @@ const postSchema = Joi.object({
 const validatePostFields = (post) => {
   const { error } = postSchema.validate(post);
 
+  console.log('error: ', error);
   if(error) return error.details[0].message;
 };
 

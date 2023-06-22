@@ -1,7 +1,8 @@
-const validatePostFields = require('../validations/validateLoginFields')
+const validatePostFields = require('../validations/validatePostFields')
 
 const validatePost = (req, res, next) => {
-  const validate = validatePostFields(req.body);
+  const { title, content } = req.body;
+  const validate = validatePostFields({ title, content });
 
   if(validate) return res.status(400).json(validate);
 

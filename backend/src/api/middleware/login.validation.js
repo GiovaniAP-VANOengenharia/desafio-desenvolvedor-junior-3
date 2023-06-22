@@ -12,11 +12,9 @@ const validateLogin = (req, res, next) => {
 const validateToken = (req, res, next) => {
   const { authorization } = req.headers;
   
-  const secret = process.env.JWT_SECRET || 'segredoDoXablau';
-  
   if (!authorization.length) return res.status(401).json({ message: 'Token not found' });
   
-  const payload = jwtConfig.verifyToken(authorization, secret);
+  const payload = jwtConfig.verifyToken(authorization);
 
   if (payload.isError) return res.status(401).json({ message: 'Expired or invalid token' });
 

@@ -1,18 +1,15 @@
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-
 require('dotenv').config();
 
-const secret = fs.readFileSync('./jwt.evaluation.key');
+const secret = process.env.JWT_SECRET;
 
 const jwtConfig = {
-  expiresIn: '10000min',
+  expiresIn: '1000min',
   algorithm: 'HS256',
 };
 
 const createToken = (user) => {
-  const token = jwt.sign(user, secret, jwtConfig);
-
+  const token = jwt.sign({ data: user }, secret, jwtConfig);
   return token;
 };
 

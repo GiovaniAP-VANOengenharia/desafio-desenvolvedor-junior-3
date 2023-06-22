@@ -25,7 +25,7 @@ const createPost = async (req, res) => {
     title, content, userId, updated: date, published: date
   });
 
-  const user = userService.getUserById(newPost.userId);
+  const user = await userService.getUserById(newPost.userId);
 
   return res.status(201).json(response(newPost, user.name, 201, 'POST'));
 };
@@ -36,7 +36,7 @@ const getAllPosts = async (_req, res) => {
   const postList = [];
 
   for (let i = 0; i < posts.length; i += 1) {
-    const user = async () => await userService.getUserById(posts[i].userId);
+    const user = await userService.getUserById(posts[i].userId);
     postList.push(response(posts[i], user.name, 200, 'GET'));
   }
 
@@ -57,7 +57,7 @@ const getPostById = async (req, res) => {
     });
   }
   
-  const user = userService.getUserById(hasPost.userId);
+  const user = await userService.getUserById(hasPost.userId);
 
   return res.status(200).json(response(hasPost, user.name, 200, 'GET'));
 };
@@ -79,7 +79,7 @@ const updatePost = async (req, res) => {
 
   const updatedPost = await postService.updatePost({ id, title, content });
   
-  const user = userService.getUserById(userId);
+  const user = await userService.getUserById(userId);
 
   return res.status(200).json(response(updatedPost, user.name, 200, 'POST'));
 };

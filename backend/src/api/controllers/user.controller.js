@@ -28,7 +28,7 @@ const login = async (req, res) => {
     });
   }
 
-  const token = jwtConfig.createToken({ id: hasUser.id, email, name: hasUser.name });
+  const token = jwtConfig.createToken({ id: hasUser.id, email });
 
   return res.status(200).json(response(hasUser, token, 200, 'POST'));
 };
@@ -48,7 +48,7 @@ const createUser = async (req, res) => {
   
   const newUser = await userService.createUser({ name, email, password: md5(password) });
 
-  const token = jwtConfig.createToken({ id: newUser.id, email, name });
+  const token = jwtConfig.createToken({ id: newUser.id, email });
 
   return res.status(201).json(response(newUser, token, 201, 'POST'));
 };
