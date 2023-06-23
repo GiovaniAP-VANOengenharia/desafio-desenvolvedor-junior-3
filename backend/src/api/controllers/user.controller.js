@@ -15,6 +15,18 @@ const response = (user, token, status, method) => ({
   },
 });
 
+const getAllUsers = async (_req, res) => {
+  const users = await userService.getAllUsers();
+
+  const userList = [];
+
+  for (let i = 0; i < users.length; i += 1) {
+    userList.push(response(users[i], 200, 'GET'));
+  }
+
+  return res.status(200).json(userList);
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   const hasUser = await userService.getLogin(email, password);
@@ -56,4 +68,5 @@ const createUser = async (req, res) => {
 module.exports = {
   login,
   createUser,
+  getAllUsers,
 };
