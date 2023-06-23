@@ -1,8 +1,20 @@
 const jwtConfig = require('../auth/jwtConfig');
-const validateLoginFields = require('../validations/validateLoginFields')
+const {
+  validateLoginFields,
+  validateRegisterFields,
+} = require('../validations/validateLoginFields')
+
 
 const validateLogin = (req, res, next) => {
   const validate = validateLoginFields(req.body);
+
+  if(validate) return res.status(400).json(validate);
+
+  next();
+};
+
+const validateRegister = (req, res, next) => {
+  const validate = validateRegisterFields(req.body);
 
   if(validate) return res.status(400).json(validate);
 
@@ -23,5 +35,6 @@ const validateToken = (req, res, next) => {
 
 module.exports = {
   validateLogin,
+  validateRegister,
   validateToken,
 };
