@@ -4,12 +4,13 @@ import { useNavigation } from "@react-navigation/native";
 import { requestLoginRegister } from '../../services/requests';
 import { propStack } from "../../routes/Stack/Models";
 import { validateRegister } from '../../middleware';
+import { useDispatch } from "react-redux";
 
 const Register = () => {
   const navigation = useNavigation<propStack>();
+  const dispatch = useDispatch();
   const [isDisabled, setIsDisabled] = useState(true);
   const [showPopUp, setShowPopUp] = useState(false);
-  const [teste, setTeste] = useState('true');
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -26,10 +27,10 @@ const Register = () => {
 
   const handleClickLoginBtn = async () => {
     try {
-      const login = await requestLoginRegister('/user/register', userData);
-      if (login.result) {
-        const { id, name, email, token } = login.result;
+      const register = await requestLoginRegister('/user/register', userData);
+      if (register.result) {
         setUserData({ ...userData, name: '', email: '', password: '' });
+        dispatch({ type: 'user/userData', payload: register.result});
         navigation.navigate("Posts");
       }
     } catch (error) {
@@ -39,7 +40,6 @@ const Register = () => {
 
   useEffect(() => {
     const loginVerified = validateRegister(userData);
-    setTeste(`${loginVerified}`)
 
     setIsDisabled(!loginVerified);
   }, [userData]);
@@ -77,6 +77,7 @@ const Register = () => {
       <TouchableOpacity
         style={{ marginTop: 12, padding: 8, backgroundColor: "#BDBDBD" }}
         onPress={ handleClickLoginBtn }
+        disabled={ isDisabled }
       >
         <Text>Posts</Text>
       </TouchableOpacity>

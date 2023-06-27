@@ -21,7 +21,7 @@ const getAllUsers = async (_req, res) => {
   const userList = [];
 
   for (let i = 0; i < users.length; i += 1) {
-    userList.push(response(users[i], 200, 'GET'));
+    userList.push(response(users[i], 'token', 200, 'GET'));
   }
 
   return res.status(200).json(userList);

@@ -4,12 +4,13 @@ import { useNavigation } from "@react-navigation/native";
 import { propStack } from "../../routes/Stack/Models";
 import { requestLoginRegister } from '../../services/requests';
 import { validateLogin } from '../../middleware';
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const navigation = useNavigation<propStack>();
   const [isDisabled, setIsDisabled] = useState(true);
   const [showPopUp, setShowPopUp] = useState(false);
-  const [teste, setTeste] = useState('true');
+  const dispatch = useDispatch();
   const [userData, setUserData] = useState({
     email: '',
     password: '',
@@ -27,8 +28,8 @@ const Login = () => {
     try {
       const login = await requestLoginRegister('/user/login', userData);
       if (login.result) {
-        const { id, name, email, token } = login.result;
         setUserData({ ...userData, email: '', password: '' });
+        dispatch({ type: 'user/userData', payload: login.result});
         navigation.navigate("Posts");
       }
     } catch (error) {
@@ -38,7 +39,6 @@ const Login = () => {
 
   useEffect(() => {
     const loginVerified = validateLogin(userData);
-    setTeste(`${loginVerified}`)
 
     setIsDisabled(!loginVerified);
   }, [userData]);
@@ -46,8 +46,6 @@ const Login = () => {
   return (
     <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1 }}>
       <Text style={{ fontSize: 20 }}>LOGIN</Text>
-      <Text style={{ fontSize: 20 }}>{teste}</Text>
-      <Text style={{ fontSize: 20 }}>{userData.name}</Text>
       <input
         id="email"
         type="text"
