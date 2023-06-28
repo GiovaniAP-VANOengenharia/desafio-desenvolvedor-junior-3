@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { propStack } from "../../routes/Stack/Models";
 import { requestLoginRegister } from '../../services/requests';
 import { validateLogin } from '../../middleware';
 import { useDispatch } from "react-redux";
+import { LoginContainer } from "./style";
 
 const Login = () => {
   const navigation = useNavigation<propStack>();
@@ -44,39 +45,41 @@ const Login = () => {
   }, [userData]);
 
   return (
-    <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1 }}>
-      <Text style={{ fontSize: 20 }}>LOGIN</Text>
-      <input
-        id="email"
-        type="text"
-        className="loginInputs"
-        placeholder="Email"
-        value={ userData.email }
-        data-testid="email-input"
-        onChange={ handleChange }
-      />
-      <input
-        id="password"
-        type="password"
-        className="loginInputs"
-        placeholder="Senha"
-        value={ userData.password }
-        data-testid="password-input"
-        onChange={ handleChange }
-      />
-      <TouchableOpacity
-        style={{ marginTop: 12, padding: 8, backgroundColor: "#BDBDBD" }}
-        onPress={ handleClickLoginBtn }
-        disabled={ isDisabled }
-      >
-        <Text>Posts</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ marginTop: 12, padding: 8, backgroundColor: "#BDBDBD" }}
-        onPress={() => navigation.navigate("Register")}
-      >
-        <Text>Register</Text>
-      </TouchableOpacity>
+    <LoginContainer>
+      <section>
+        <Text style={{ fontSize: 20 }}>LOGIN</Text>
+        <input
+          id="email"
+          type="text"
+          className="loginInputs"
+          placeholder="Email"
+          value={ userData.email }
+          data-testid="email-input"
+          onChange={ handleChange }
+        />
+        <input
+          id="password"
+          type="password"
+          className="loginInputs"
+          placeholder="Senha"
+          value={ userData.password }
+          data-testid="password-input"
+          onChange={ handleChange }
+        />
+      </section>
+      <div className="login-buttons">
+        <TouchableOpacity
+          onPress={ handleClickLoginBtn }
+          disabled={ isDisabled }
+        >
+          <Text>Posts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Register")}
+        >
+          <Text>Register</Text>
+        </TouchableOpacity>
+      </div>
       { showPopUp && (
         <p
           data-testid="common_login__element-invalid-email"
@@ -84,7 +87,7 @@ const Login = () => {
         >
           Login ou senha inválidos
         </p>)}
-    </View>
+    </LoginContainer>
   )
 }
 

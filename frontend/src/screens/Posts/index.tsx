@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { propStack } from "../../routes/Stack/Models";
 import { useDispatch, useSelector } from "react-redux";
-import PostCard from '../../componets/Posts';
+import PostCard from '../../components/Posts';
 import { requestData, setToken } from "../../services/requests";
 
 const Posts = () => {
