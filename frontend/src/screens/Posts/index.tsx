@@ -1,72 +1,186 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { propStack } from "../../routes/Stack/Models";
 import { useDispatch, useSelector } from "react-redux";
 import PostCard from '../../components/Posts';
+import { UserState } from '../../redux/slices/userSlice';
 import { requestData, setToken } from "../../services/requests";
+import { PostData } from '../../redux/slices/postSlice';
+import { PostContainer } from "./style";
 
 const Posts = () => {
   const navigation = useNavigation<propStack>();
   const [showPopUp, setShowPopUp] = useState(false);
+  const [search, setSearch] = useState('');
+  const [tofilters, setToFilters] = useState(false);
+  const [byId, setById] = useState('');
+  const [allPosts, setAllPosts] = useState([]);
+  const [myPosts, setMyPosts] = useState(false);
   const [posts, setPosts] = useState([]);
   const dispatch = useDispatch();
+  const [classes, setClasses] = useState({
+    getId: 'invisible-',
+    todos: 'invisible',
+    mine: 'invisible',
+    filter: 'post-filter',
+  });
   const [userData, setUserData] = useState({
     id: '',
     name: '',
     email: '',
     token: '',
   });
+  
+  const dataUser = useSelector((state: UserState) => state.user);
+  const postSearch = useSelector((state: UserState) => state.search);
 
-  const dataUser = useSelector((state: Object) => state.user);
+  const updateRedux = (postList: PostData[]) => {
+    setPosts(postList);
+    dispatch({ type: 'posts/postData', payload: { postList }});
+  };
 
-  const postListData = async () => {
+  const getPosts = async (toGet: string) => {
     try {
-      setToken(dataUser.token);
-      const postData = await requestData('/post/all');
-      const postList = postData.map((post: Object) => post.result);
-      setPosts(postList);
-      // const data = new Date("2011-08-01T19:58:00.003Z");
-      const data = new Date();
-      console.log(typeof(data));
-      dispatch({ type: 'posts/postData', payload: { postList }});
+      const postData = await requestData(`/post/${toGet}`);
+      let postList = [];
+      if(postData.result) {
+        postList = [postData.result];
+      } else {
+        postList = postData.map((post: PostData) => post.result);
+        setAllPosts(postList);
+      }
+      updateRedux(postList);
     } catch (error) {
       setShowPopUp(true);
     }
-  }
+  };
+  
+  const searchPost = (src: string) => {
+    const user: string | null = localStorage.getItem('user');
+    if(user) setToken(user);
+    getPosts(src);
+    setUserData(dataUser);
+    setSearch('');
+  };
 
   useEffect(() => {
-    setUserData(dataUser);
-    postListData();
-  }, [dataUser]);
+    if(postSearch.search) {
+      searchPost(postSearch.search);
+      setSearch('');
+      dispatch({ type: 'search/postSearch', payload: ''});
+    };
+  }, []);
+
+  useEffect(() => {
+    if(search) {
+      searchPost(search);
+      setSearch('');
+    }
+  }, [search]);
+
+  useEffect(() => {
+    if(myPosts) {
+      setClasses({
+        ...classes,
+        getId: 'invisible',
+        todos: 'invisible',
+        filter: 'invisible',
+      });
+      setPosts(allPosts
+        .filter((post: PostData) => post.userName === userData.name));
+    } else {
+      setClasses({
+        ...classes,
+        getId: 'post-id-input',
+        todos: 'post-getAll',
+        filter: 'post-filter',
+      });
+    }
+  }, [myPosts]);
+
+  useEffect(() => {
+    if(!tofilters){
+      setClasses({
+        ...classes,
+        getId: 'invisible',
+        todos: 'invisible',
+        mine: 'invisible',
+      });
+    } else {
+      setClasses({
+        ...classes,
+        getId: 'post-id-input',
+        todos: 'post-getAll',
+        mine: 'post-myposts',
+      });
+    }
+  }, [tofilters]);
 
   return (
-    <View style={{ flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1 }}>
-      <Text style={{ fontSize: 20 }}>{ userData.name }</Text>
-      <Text style={{ fontSize: 20 }}>{ userData.email }</Text>
-      <TouchableOpacity
-        style={{ marginTop: 12, padding: 8, backgroundColor: "#BDBDBD" }}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Text>SAIR</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ marginTop: 12, padding: 8, backgroundColor: "#BDBDBD" }}
-        onPress={() => navigation.navigate("Register")}
-      >
-        <Text>Register</Text>
-      </TouchableOpacity>
-      { showPopUp && (
-        <p
-          data-testid="common_register__element-invalid_register"
-          style={ { textAlign: 'center' } }
+    <PostContainer>
+      <div className="posts-header">
+        <Text>{ userData.name }</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
         >
-          Token inválido!
-        </p>)}
-        { posts.map((post) => (
+          <Text>SAIR</Text>
+        </TouchableOpacity>
+      </div>
+      <div className="search">
+        <div className={ `${classes.getId}` }>
+          <input
+            id="post-id"
+            type="number"
+            className="searchInputs"
+            placeholder="id"
+            value={ byId }
+            data-testid="post-id-input"
+            onChange={(e) => setById(e.target.value)}
+          />
+          <TouchableOpacity
+            onPress={() => setSearch(byId)}
+          >
+            <Text>Id</Text>
+          </TouchableOpacity>
+        </div>
+        <div className={ `${classes.todos}` }>
+          <TouchableOpacity
+            onPress={() => setSearch('all')}
+          >
+            <Text>Todos</Text>
+          </TouchableOpacity>
+        </div>
+        <div className={ `${classes.mine}` }>
+          <TouchableOpacity
+            onPress={() => setMyPosts(!myPosts)}
+          >
+            <Text>{ myPosts ? 'Todos' : 'Meus Posts' }</Text>
+          </TouchableOpacity>
+        </div>
+        <div className={ `${classes.filter}` }>
+          <TouchableOpacity
+            onPress={() => setToFilters(!tofilters)}
+          >
+            <Text>Filtros</Text>
+          </TouchableOpacity>
+        </div>
+      </div>
+      <div>
+        { showPopUp && (
+          <p
+            data-testid="common_register__element-invalid_register"
+          >
+            Token inválido!
+          </p>)
+        }
+      </div>
+      <div className="posts-wall">
+        { posts.map((post: PostData) => (
             <PostCard post={ post } key={ post.id } />
           ))}
-    </View>
+      </div>
+    </PostContainer>
   )
 }
 

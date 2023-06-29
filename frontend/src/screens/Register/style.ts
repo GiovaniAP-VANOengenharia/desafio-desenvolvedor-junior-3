@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 
-export const LoginContainer = styled.div`
+export const RegisterContainer = styled.div`
   width: 412px;
   height: 100%;
   display: flex;
@@ -10,11 +10,11 @@ export const LoginContainer = styled.div`
   justify-content: center;
   background: ${({ theme }) => theme.background};
 
-  .loginInputs {
+  .RegisterInputs {
     font-size: 20px;
   }
   
-  .login-buttons {
+  .register-buttons {
     width: 80%;
     display: flex;
     justify-content: space-between;
@@ -29,12 +29,12 @@ export const LoginContainer = styled.div`
     .css-text-1rynq56 {
       display: flex;
       justify-content: center;
-    };
-  };
+    }
+  }
   
   .css-text-1rynq56 {
     font-size: 20px;
     display: flex;
     justify-content: center;
-  };
+  }
 `;

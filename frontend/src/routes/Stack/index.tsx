@@ -10,7 +10,7 @@ const { Navigator, Screen } = createNativeStackNavigator<propsNavigationStack>()
 
 export default function() {
   return(
-    <Navigator initialRouteName="Login">
+    <Navigator initialRouteName="Posts">
       <Screen name="Login" component={Login} />
       <Screen name="Posts" component={Posts} />
       <Screen name="Register" component={Register} />

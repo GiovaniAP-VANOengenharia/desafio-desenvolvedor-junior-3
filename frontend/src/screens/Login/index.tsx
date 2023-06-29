@@ -30,6 +30,8 @@ const Login = () => {
       const login = await requestLoginRegister('/user/login', userData);
       if (login.result) {
         setUserData({ ...userData, email: '', password: '' });
+        localStorage.setItem('user', login.message);
+        dispatch({ type: 'search/postSearch', payload: 'all'});
         dispatch({ type: 'user/userData', payload: login.result});
         navigation.navigate("Posts");
       }
@@ -44,10 +46,14 @@ const Login = () => {
     setIsDisabled(!loginVerified);
   }, [userData]);
 
+  useEffect(() => {
+    setShowPopUp(false);
+  }, []);
+
   return (
     <LoginContainer>
       <section>
-        <Text style={{ fontSize: 20 }}>LOGIN</Text>
+        <Text>LOGIN</Text>
         <input
           id="email"
           type="text"
@@ -72,12 +78,12 @@ const Login = () => {
           onPress={ handleClickLoginBtn }
           disabled={ isDisabled }
         >
-          <Text>Posts</Text>
+          <Text>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("Register")}
         >
-          <Text>Register</Text>
+          <Text>Cadastrar</Text>
         </TouchableOpacity>
       </div>
       { showPopUp && (
