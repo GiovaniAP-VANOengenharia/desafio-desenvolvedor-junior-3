@@ -36,12 +36,15 @@ export const PostContainer = styled.div`
     .post-id-input {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+      height: 40px
     }
     
     input {
       font-size: 15px;
       width: 45%;
-      height: 30px;
+      height: 27px;
     }
 
     .css-text-1rynq56 {
@@ -55,17 +58,21 @@ export const PostContainer = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 45%;
       height: 30px;
       border-radius: 3px;
-      margin: 5px 0;
       background: ${({ theme }) => theme.secondary};
     };
     
     .post-getAll, .post-myposts, .post-filter {
       .css-view-175oi2r {
         width: 100%;
+        margin: 5px 0;
       };
+    };
+
+    .post-id-input .css-view-175oi2r {
+      width: 40%;
+      margin: 5px 0;
     };
   };
 

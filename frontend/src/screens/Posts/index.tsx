@@ -3,10 +3,11 @@ import { Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { propStack } from "../../routes/Stack/Models";
 import { useDispatch, useSelector } from "react-redux";
-import PostCard from '../../components/Posts';
+import PostCard from '../../components/PostCard';
 import { UserState } from '../../redux/slices/userSlice';
 import { requestData, setToken } from "../../services/requests";
 import { PostData } from '../../redux/slices/postSlice';
+import { invSearch, viewSearch} from './utils';
 import { PostContainer } from "./style";
 
 const Posts = () => {
@@ -14,16 +15,19 @@ const Posts = () => {
   const [showPopUp, setShowPopUp] = useState(false);
   const [search, setSearch] = useState('');
   const [tofilters, setToFilters] = useState(false);
+  const [toCreate, setToCreate] = useState(false);
   const [byId, setById] = useState('');
   const [allPosts, setAllPosts] = useState([]);
   const [myPosts, setMyPosts] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [newPostAct, setNewPostAct] = useState('invisible');
   const dispatch = useDispatch();
   const [classes, setClasses] = useState({
     getId: 'invisible-',
     todos: 'invisible',
     mine: 'invisible',
     filter: 'post-filter',
+    newPost: 'post-newpost',
   });
   const [userData, setUserData] = useState({
     id: '',
@@ -79,42 +83,32 @@ const Posts = () => {
     }
   }, [search]);
 
+  const changeCls = (array: string[], check: boolean) => {
+    const changeClasses = check ? { ...viewSearch } : { ...invSearch };
+    array.forEach((item) => {
+      delete changeClasses[item];
+    });
+    setClasses({ ...classes, ...changeClasses });
+  };
+
   useEffect(() => {
+    changeCls(['newPost'], !toCreate);
+    if(toCreate) setNewPostAct('post-newpost-act');
+    else setNewPostAct('invisible');
+  }, [toCreate]);
+
+  useEffect(() => {
+    changeCls(['mine', 'newPost'], !myPosts);
     if(myPosts) {
-      setClasses({
-        ...classes,
-        getId: 'invisible',
-        todos: 'invisible',
-        filter: 'invisible',
-      });
       setPosts(allPosts
         .filter((post: PostData) => post.userName === userData.name));
     } else {
-      setClasses({
-        ...classes,
-        getId: 'post-id-input',
-        todos: 'post-getAll',
-        filter: 'post-filter',
-      });
+      setPosts(allPosts);
     }
   }, [myPosts]);
 
   useEffect(() => {
-    if(!tofilters){
-      setClasses({
-        ...classes,
-        getId: 'invisible',
-        todos: 'invisible',
-        mine: 'invisible',
-      });
-    } else {
-      setClasses({
-        ...classes,
-        getId: 'post-id-input',
-        todos: 'post-getAll',
-        mine: 'post-myposts',
-      });
-    }
+    changeCls(['filter', 'newPost'], tofilters);
   }, [tofilters]);
 
   return (
@@ -165,6 +159,16 @@ const Posts = () => {
             <Text>Filtros</Text>
           </TouchableOpacity>
         </div>
+        <div className={ `${classes.newPost}` }>
+          <TouchableOpacity
+            onPress={() => setToCreate(!toCreate)}
+          >
+            <Text>Novo Post</Text>
+          </TouchableOpacity>
+          <div className={ `${newPostAct}` }>
+            <PostCard post={ '' } newPost={ true } />
+          </div>
+        </div>
       </div>
       <div>
         { showPopUp && (
@@ -177,7 +181,7 @@ const Posts = () => {
       </div>
       <div className="posts-wall">
         { posts.map((post: PostData) => (
-            <PostCard post={ post } key={ post.id } />
+            <PostCard post={ post } newPost={ false } key={ post.id } />
           ))}
       </div>
     </PostContainer>

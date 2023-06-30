@@ -12,12 +12,13 @@ import { PostData } from '../../redux/slices/postSlice';
 import { useDispatch } from 'react-redux';
 
 function PostCard(props) {
-  const { post } = props;
+  const { post, newPost } = props;
+  const dispatch = useDispatch();
   const [date, setDate] = useState('');
   const [showPopUp, setShowPopUp] = useState(false);
   const [toEdit, setToEdit] = useState(false);
+  const [newPostAct, setNewPostAct] = useState(false);
   const [search, setSearch] = useState('all');
-  const dispatch = useDispatch();
   const [postData, setPostData] = useState({
     title: '',
     content: '',
@@ -87,17 +88,20 @@ function PostCard(props) {
       const data = dataOfPublising();
       setDate(`publicado a ${data}`);
     }
+    setToEdit(newPost);
+    setNewPostAct(newPost);
   }, [post]);
 
  return (
   <PostCardContainer>
+    <div>
     <div className='post-title-content'>
     { toEdit ? (
-        <div>
+        <div className='post-inputs'>
           <input
             id="title"
             type="text"
-            className="postInputs"
+            className="post-title-input"
             placeholder="Titulo"
             value={ postData.title }
             data-testid="email-input"
@@ -105,13 +109,13 @@ function PostCard(props) {
           />
           <textarea
             id="content"
-            className="postInputs"
+            className="post-content-input"
             placeholder="Texto..."
             value={ postData.content }
             data-testid="email-input"
             onChange={ handleChange }
           />
-          </div>
+        </div>
     ): (
       <div>
         <p className='post-title'>{ post.title }</p>
@@ -142,6 +146,7 @@ function PostCard(props) {
         >
           Token inválido!
         </p>)}
+    </div>
   </PostCardContainer>
  );
 }
